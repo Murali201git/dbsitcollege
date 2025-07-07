@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Registration System</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('assets/dbs.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Left Sidebar */
+    .sidebar {
+      width: 250px;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 20px;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    /* Right Main Section */
+    .main {
+      flex: 1;
+      background-color: rgba(255, 255, 255, 0.368);
+      padding: 30px;
+    }
+
+    .nav-buttons {
+      text-align: right;
+      margin-bottom: 20px;
+    }
+
+    .nav-buttons button {
+      padding: 10px 20px;
+      margin-left: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .nav-buttons button:hover {
+      background-color: #0056b3;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .btn {
+      margin-top: 20px;
+      background-color: green;
+      color: white;
+      padding: 12px;
+      border: none;
+      width: 100%;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: darkgreen;
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+
+    .success {
+      color: green;
+      margin-top: 10px;
+    }
+
+    .details {
+      background: #f0fff0;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 15px;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- Left Sidebar -->
+  <div class="sidebar">
+    <h2>DBSIT COLLEGE</h2>
+    <p>Student<br>Registration<br>System</p>
+  </div>
+
+  <!-- Right Content -->
+  <div class="main">
+    <div class="nav-buttons">
+      <button onclick="showPage('home')">Home</button>
+      <button onclick="showPage('register')">Register</button>
+      <button onclick="showPage('check')">Check Details</button>
+      <button onclick="showPage('login')">Login</button>
+    </div>
+
+    <!-- Pages -->
+    <div id="home" class="page active">
+      <h3>Welcome to DBSIT Student Management System</h3>
+      <p>Please use the buttons above to register, check your info, or login.</p>
+    </div>
+
+    <div id="register" class="page">
+      <h3>Register New Student</h3>
+      <form id="registerForm" onsubmit="return registerStudent()">
+        <label>Full Name</label>
+        <input type="text" id="regName" required>
+
+        <label>Email</label>
+        <input type="email" id="regEmail" required>
+
+        <label>Password</label>
+        <input type="password" id="regPassword" required>
+
+        <label>Course</label>
+        <select id="regCourse" required>
+          <option value="">--Select Course--</option>
+          <option value="B.Tech">B.Tech</option>
+          <option value="B.Sc">B.Sc</option>
+          <option value="B.Com">B.Com</option>
+          <option value="BA">BA</option>
+        </select>
+
+        <button type="submit" class="btn">Register</button>
+        <p id="regMsg"></p>
+      </form>
+    </div>
+
+    <div id="check" class="page">
+      <h3>Check Student Details</h3>
+      <label>Enter Email</label>
+      <input type="email" id="checkEmail">
+      <button onclick="checkStudent()" class="btn">Check</button>
+      <div id="studentDetails"></div>
+    </div>
+
+    <div id="login" class="page">
+      <h3>Student Login</h3>
+      <label>Email</label>
+      <input type="email" id="loginEmail" required>
+
+      <label>Password</label>
+      <input type="password" id="loginPassword" required>
+
+      <button onclick="loginStudent()" class="btn">Login</button>
+      <p id="loginMsg"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(page => {
+      page.classList.remove('active');
+    });
+    document.getElementById(pageId).classList.add('active');
+  }
+
+  function registerStudent() {
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value.trim();
+    const course = document.getElementById('regCourse').value;
+    const msg = document.getElementById('regMsg');
+
+    if (!name || !email || !password || !course) {
+      msg.textContent = "Please fill all fields.";
+      msg.className = "error";
+      return false;
+    }
+
+    const student = { name, email, password, course };
+    localStorage.setItem(email, JSON.stringify(student));
+    msg.textContent = "Student Registered Successfully!";
+    msg.className = "success";
+    document.getElementById('registerForm').reset();
+    return false;
+  }
+
+  function checkStudent() {
+    const email = document.getElementById('checkEmail').value.trim();
+    const detailsDiv = document.getElementById('studentDetails');
+    const studentData = localStorage.getItem(email);
+
+    if (studentData) {
+      const student = JSON.parse(studentData);
+      detailsDiv.innerHTML = `
+        <div class="details">
+          <strong>Name:</strong> ${student.name}<br>
+          <strong>Email:</strong> ${student.email}<br>
+          <strong>Course:</strong> ${student.course}
+        </div>
+      `;
+    } else {
+      detailsDiv.innerHTML = `<p class="error">No student found with this email.</p>`;
+    }
+  }
+
+  function loginStudent() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+    const msg = document.getElementById('loginMsg');
+    const studentData = localStorage.getItem(email);
+
+    if (!studentData) {
+      msg.textContent = "No account found.";
+      msg.className = "error";
+      return;
+    }
+
+    const student = JSON.parse(studentData);
+    if (student.password === password) {
+      msg.textContent = "Login successful! Welcome, " + student.name;
+      msg.className = "success";
+    } else {
+      msg.textContent = "Incorrect password.";
+      msg.className = "error";
+    }
+  }
+</script>
+
+</body>
+</html>
